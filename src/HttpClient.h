@@ -2,6 +2,26 @@
 
 #include "TcpClient.h"
 
+class HttpRequest {
+public:
+	HttpRequest();
+	~HttpRequest();
+	
+protected:
+	bool mAuthenticate;
+	bool mCacheResponse;
+	bool mFollowRedirect;
+	std::string mUsername;
+	std::string mPassword;
+	std::string mUserAgent;
+	std::string mContentType;
+	std::string mMethod;
+	std::string mHost;
+	std::string mPath;
+	uint16_t mPort;
+	uint32_t mTimeout;
+}
+
 typedef std::shared_ptr<class HttpClient>	HttpClientRef;
 
 class HttpClient : public TcpClient
@@ -16,7 +36,7 @@ public:
 	static HttpClientRef	create();
 	virtual ~HttpClient();
 	
-	virtual void			connect( const std::string& host = "localhost", uint16_t port = 80 );
+	virtual void			connect( const std::string& host = "localhost", const uint16_t port = 80 );
 
 	virtual void			send( const std::string& path, const std::string& method = "GET",
 								 uint_fast8_t* buffer = 0, size_t count = 0 );

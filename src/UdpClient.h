@@ -10,9 +10,9 @@ public:
 	static UdpClientRef				create();
 	virtual ~UdpClient();
 	
-	virtual void					connect( const std::string& host = "localhost", uint16_t port = 2000 );
+	virtual void					connect( const std::string& host = "localhost", const uint16_t port = 2000 );
 	
-	void							send( uint_fast8_t* buffer, size_t count );
+	virtual void					send( uint_fast8_t* buffer, size_t count );
 private:
 	typedef std::shared_ptr<boost::asio::ip::udp::socket>	UdpSocketRef;
 	

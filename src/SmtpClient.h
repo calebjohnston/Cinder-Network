@@ -10,7 +10,7 @@ public:
 	static SmtpClientRef	create();
 	virtual ~SmtpClient();
 	
-	virtual void			connect( const std::string& host = "localhost", uint16_t port = 25 );
+	virtual void			connect( const std::string& host = "localhost", const uint16_t port = 25 );
 protected:
 	SmtpClient();
 	

@@ -10,7 +10,7 @@ public:
 	static WebSocketClientRef		create();
 	virtual ~WebSocketClient();
 	
-	virtual void					connect( const std::string& host = "localhost", uint16_t port = 80 );
+	virtual void					connect( const std::string& host = "localhost", const uint16_t port = 80 );
 	
 	const std::string&				getKey() const;
 	void							setKey( const std::string& value );

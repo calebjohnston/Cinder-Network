@@ -23,7 +23,7 @@ public:
 	static HttpStreamingClientRef create();
 	virtual ~HttpStreamingClient();
 	
-	virtual void connect( const std::string& host = "localhost", uint16_t port = 80 );
+	virtual void connect( const std::string& host = "localhost", const uint16_t port = 80 );
 
 	//void send( const std::string& path, const std::string& method = "GET", uint_fast8_t* buffer = 0, size_t count = 0 );
 	virtual void update();

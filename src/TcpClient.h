@@ -10,7 +10,7 @@ public:
 	static TcpClientRef				create();
 	virtual ~TcpClient();
 	
-	virtual void					connect( const std::string& host = "localhost", uint16_t port = 2000 );
+	virtual void					connect( const std::string& host = "localhost", const uint16_t port = 2000 );
 protected:
 	typedef std::shared_ptr<boost::asio::ip::tcp::socket>	TcpSocketRef;
 	

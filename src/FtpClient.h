@@ -10,7 +10,7 @@ public:
 	static FtpClientRef	create();
 	virtual ~FtpClient();
 	
-	virtual void			connect( const std::string& host = "localhost", uint16_t port = 21 );
+	virtual void			connect( const std::string& host = "localhost", const uint16_t port = 21 );
 protected:
 	FtpClient();
 	

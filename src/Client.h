@@ -18,12 +18,12 @@ public:
 	virtual ~Client();
 	
 	//! Connects to \a host on port number \a port.
-	virtual void		connect( const std::string &host, uint16_t port ) = 0;
+	virtual void		connect( const std::string &host, const uint16_t port ) = 0;
 	//! Returns true if connected
 	bool				isConnected() const;
 
 	//! Sends \a buffer of length \a count.
-	void				send( uint_fast8_t* buffer, size_t count );
+	virtual void		send( uint_fast8_t* buffer, size_t count );
 	
 	//! Returns host as string.
 	const std::string&	getHost() const;
