@@ -1,3 +1,10 @@
+
+#include <boost/archive/iterators/base64_from_binary.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
+#include <boost/archive/iterators/ostream_iterator.hpp>
+
+#include "cinder/Utilities.h"
+
 #include "HttpClient.h"
 
 using namespace ci;
@@ -85,6 +92,20 @@ void HttpClient::concatenateHeader()
 	mHeader += "\r\n";
 	for ( HeaderMap::const_iterator iter = mHeaders.begin(); iter != mHeaders.end(); ++iter ) {
 		mHeader += iter->first + ": " + iter->second + "\r\n";
+	}
+}
+
+void HttpClient::setCredentials( const string& username, const string& password )
+{
+	using boost::archive::iterators;
+	
+	if (!username.empty() && !password.empty()) {
+		string http_credentials = username + ":" + password;
+		stringstream os;
+		// Base64 encode username and password for HTTP access authorization
+		std::copy(Base64Text(http_credentials.c_str()), Base64Text(http_credentials.c_str() + http_credentials.size()), ostream_iterator<char>(os));
+		http_credentials = "Basic " + os.str() + "=\r\n";
+		setHeaderField("Authorization", http_credentials);
 	}
 }
 

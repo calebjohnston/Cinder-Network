@@ -7,6 +7,7 @@ typedef std::shared_ptr<class HttpClient>	HttpClientRef;
 class HttpClient : public TcpClient
 {
 public:
+	HttpHeader
 	typedef std::map<std::string, std::string> HeaderMap;
 	
 	enum {
@@ -36,14 +37,17 @@ public:
 		if \a key is not found. */
 	void					setHeaderField( const std::string& key, const std::string& value );
 	
-	HttpVersion				getHttpVersion() const;
-	void					setHttpVersion( HttpVersion v );
+	HttpVersion				getHttpVersion() const { return mHttpVersion; }
+	void					setHttpVersion( const HttpVersion v ) { mHttpVersion = v; }
 	
-	const std::string&		getMethod() const;
-	void					setMethod( const std::string& m );
+	const std::string&		getMethod() const { return mMethod; }
+	void					setMethod( const std::string& m ) { mMethod = m; }
 	
-	const std::string&		getPath() const;
-	void					setPath( const std::string& p );
+	const std::string&		getPath() const { return mPath; }
+	void					setPath( const std::string& p ) { mPath = p; }
+	
+	void					setCredentials( const std::string& username, const std::string& password );
+	
 protected:
 	HttpClient();
 	
