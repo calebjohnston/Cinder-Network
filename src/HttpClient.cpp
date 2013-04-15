@@ -8,92 +8,86 @@
 using namespace ci;
 using namespace std;
 
-HttpClientRef HttpClient::create()
+HttpRequest::HttpRequest( const std::string& rawHeaders )
+:	mRawHeaders(rawHeaders), mRawHeaderInvalidated(false)
 {
-	return HttpClientRef( new HttpClient() );
 }
 
-HttpClient::HttpClient()
-: TcpClient(), mHeader( "" ), mHttpVersion( HttpVersion::HTTP_1_0 ),
-mMethod( "GET" ), mPath( "/" )
-{
-	concatenateHeader();
-}
-
-HttpClient::~HttpClient()
+HttpRequest::~HttpRequest()
 {
 	mHeaders.clear();
-	mHeader.clear();
-	mPath.clear();
-	mMethod.clear();
 }
 
-void HttpClient::connect( const string& host, uint16_t port )
+void HttpRequest::eraseHeaderField( const string& key )
 {
-	TcpClient::connect( host, port );
-}
-
-void HttpClient::send( const string& path, const string& method,
-					  uint_fast8_t* buffer, size_t count )
-{
-	bool concat = path != mPath || method != mMethod;
-	mPath	= path;
-	mMethod	= method;
-	if ( concat ) {
-		concatenateHeader();
+	KeyValueMapIter value_iter = mHeaders.find( key );
+	if ( value_iter != mHeaders.end() ) {
+		mHeaders.erase( value_iter );
+		mRawHeaderInvalidated = true;
 	}
-	sendImpl( buffer, count );
 }
 
-const string& HttpClient::getHeader() const
+string HttpRequest::getHeaderField( const string& key ) const
 {
-	return mHeader;
-}
-
-void HttpClient::eraseHeaderField( const string& key )
-{
-	if ( mHeaders.find( key ) != mHeaders.end() ) {
-		mHeaders.erase( mHeaders.find( key ) );
-		concatenateHeader();
+	KeyValueMapConstIter value_iter = mHeaders.find( key );
+	if ( value_iter != mHeaders.end() ) {
+		return value_iter->second;
 	}
-	throw ExcHeaderNotFound( key );
+	else return "";
 }
 
-const string& HttpClient::getHeaderField( const string& key ) const
-{
-	if ( mHeaders.find( key ) != mHeaders.end() ) {
-		return mHeaders.find( key )->second;
-	}
-	throw ExcHeaderNotFound( key );
-}
-
-void HttpClient::setHeaderField( const string& key, const string& value )
+void HttpRequest::setHeaderField( const string& key, const string& value )
 {
 	mHeaders[ key ] = value;
-	concatenateHeader();
+	mRawHeaderInvalidated = true;
 }
 
-void HttpClient::concatenateHeader()
+void HttpRequest::setFollowRedirect( bool value )
 {
-	mHeader = mMethod + " " + mPath + " HTTP/";
-	switch ( mHttpVersion ) {
-		case HTTP_1_0:
-			mHeader += "1.0";
-			break;
-		case HTTP_1_1:
-			mHeader += "1.1";
-			break;
-		case HTTP_2_0:
-			mHeader += "2.0";
-			break;
-	}
-	mHeader += "\r\n";
-	for ( HeaderMap::const_iterator iter = mHeaders.begin(); iter != mHeaders.end(); ++iter ) {
-		mHeader += iter->first + ": " + iter->second + "\r\n";
-	}
+	//setHeaderField("","");
 }
 
-void HttpClient::setCredentials( const string& username, const string& password )
+void HttpRequest::setCacheResponse( bool value )
+{
+	//setHeaderField("","");
+}
+
+void HttpRequest::setUserAgent( const std::string& value )
+{
+	//setHeaderField("","");
+}
+
+void HttpRequest::setTimeout( const uint32_t value )
+{
+	//setHeaderField("","");
+}
+
+void HttpRequest::setConnection()
+{
+	//setHeaderField("","");
+}
+
+void HttpRequest::setAcceptType( const std::string& value )
+{
+	//setHeaderField("","");
+}
+
+void HttpRequest::setAcceptCharset( const std::string& value )
+{
+	//setHeaderField("","");
+}
+
+void HttpRequest::setAcceptLanguage( const std::string& value )
+{
+	//setHeaderField("","");
+}
+
+void HttpRequest::setAcceptEncoding( const std::string& value )
+{
+	//setHeaderField("","");
+}
+
+void HttpRequest::setAuthorization( const string& username, const string& password )
 {
 	namespace boost_iters = boost::archive::iterators;
 	
@@ -107,6 +101,79 @@ void HttpClient::setCredentials( const string& username, const string& password 
 		http_credentials = "Basic " + os.str() + "=\r\n";
 		setHeaderField("Authorization", http_credentials);
 	}
+}
+
+
+const string& HttpRequest::toString() const
+{
+	mRawHeaders = concatenateHeader();
+	return mRawHeaders;
+}
+
+string HttpRequest::concatenateHeader() const
+{
+	string output = mMethod + " " + mPath + " HTTP/";
+	switch ( mHttpVersion ) {
+		case HTTP_1_0:
+			output += "1.0";
+			break;
+		case HTTP_1_1:
+			output += "1.1";
+			break;
+		case HTTP_2_0:
+			output += "2.0";
+			break;
+	}
+	output += "\r\n";
+	for ( KeyValueMapConstIter iter = mHeaders.begin(); iter != mHeaders.end(); ++iter ) {
+		output += iter->first + ": " + iter->second + "\r\n";
+	}
+	
+	mRawHeaderInvalidated = false;
+	
+	return output;
+}
+
+HttpClientRef HttpClient::create()
+{
+	return HttpClientRef( new HttpClient() );
+}
+
+HttpClient::HttpClient() : TcpClient(), mHeader( "" )
+{
+}
+
+HttpClient::~HttpClient()
+{
+	mHeader.clear();
+}
+
+void HttpClient::connect( const string& host, uint16_t port )
+{
+	TcpClient::connect( host, port );
+}
+
+void HttpClient::send( const string& path, const string& method, uint_fast8_t* buffer, size_t count )
+{
+	/*
+	bool concat = path != mPath || method != mMethod;
+	mPath	= path;
+	mMethod	= method;
+	if ( concat ) {
+		concatenateHeader();
+	}
+	*/
+	sendImpl( buffer, count );
+}
+
+void HttpClient::send( const HttpRequest& request )
+{
+	
+}
+
+void HttpClient::send( const std::string& header )
+{
+	
 }
 
 void HttpClient::sendImpl( uint_fast8_t* buffer, size_t count )

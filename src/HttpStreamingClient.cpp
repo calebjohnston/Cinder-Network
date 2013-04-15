@@ -123,10 +123,10 @@ bool HttpStreamingClient::openConnection()
 	// Form the HTTP request for data
 	boost::asio::streambuf request;
 	ostream request_stream(&request);
-	request_stream << "GET " << mPath << " HTTP/1.0\r\n";
-	request_stream << "Host: " << mHost << "\r\n";
-	request_stream << "Accept: */*\r\n";
-	request_stream << "Connection: close\r\n\r\n";
+	//request_stream << "GET " << mPath << " HTTP/1.0\r\n";
+	//request_stream << "Host: " << mHost << "\r\n";
+	//request_stream << "Accept: */*\r\n";
+	//request_stream << "Connection: close\r\n\r\n";
 	
 	// Dispatch the request
 	boost::system::error_code err;	// using error codes instead of exceptions
