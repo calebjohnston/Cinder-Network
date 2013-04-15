@@ -8,11 +8,11 @@ class SmtpClient : public Client
 {
 public:
 	static SmtpClientRef	create();
-	~SmtpClient();
+	virtual ~SmtpClient();
 	
-	void					connect( const std::string& host = "localhost", uint16_t port = 25 );
+	virtual void			connect( const std::string& host = "localhost", uint16_t port = 25 );
 protected:
 	SmtpClient();
 	
-	void					sendImpl( uint_fast8_t* buffer, size_t count );
+	virtual void			sendImpl( uint_fast8_t* buffer, size_t count );
 };

@@ -8,9 +8,9 @@ class WebSocketClient : public HttpClient
 {
 public:
 	static WebSocketClientRef		create();
-	~WebSocketClient();
+	virtual ~WebSocketClient();
 	
-	void							connect( const std::string& host = "localhost", uint16_t port = 80 );
+	virtual void					connect( const std::string& host = "localhost", uint16_t port = 80 );
 	
 	const std::string&				getKey() const;
 	void							setKey( const std::string& value );

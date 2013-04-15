@@ -7,7 +7,6 @@ typedef std::shared_ptr<class HttpClient>	HttpClientRef;
 class HttpClient : public TcpClient
 {
 public:
-	HttpHeader
 	typedef std::map<std::string, std::string> HeaderMap;
 	
 	enum {
@@ -15,11 +14,11 @@ public:
 	} typedef HttpVersion;
 	
 	static HttpClientRef	create();
-	~HttpClient();
+	virtual ~HttpClient();
 	
 	virtual void			connect( const std::string& host = "localhost", uint16_t port = 80 );
 
-	void					send( const std::string& path, const std::string& method = "GET",
+	virtual void			send( const std::string& path, const std::string& method = "GET",
 								 uint_fast8_t* buffer = 0, size_t count = 0 );
 	
 	//! Returns complete header as a string.
@@ -51,7 +50,7 @@ public:
 protected:
 	HttpClient();
 	
-	void					sendImpl( uint_fast8_t* buffer, size_t count );
+	virtual void			sendImpl( uint_fast8_t* buffer, size_t count );
 	
 	void					concatenateHeader();
 	std::string				mHeader;

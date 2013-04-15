@@ -8,11 +8,11 @@ class FtpClient : public Client
 {
 public:
 	static FtpClientRef	create();
-	~FtpClient();
+	virtual ~FtpClient();
 	
-	void					connect( const std::string& host = "localhost", uint16_t port = 21 );
+	virtual void			connect( const std::string& host = "localhost", uint16_t port = 21 );
 protected:
 	FtpClient();
 	
-	void					sendImpl( uint_fast8_t* buffer, size_t count );
+	virtual void			sendImpl( uint_fast8_t* buffer, size_t count );
 };

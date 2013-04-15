@@ -15,7 +15,7 @@ private:
 	typedef std::shared_ptr<Callback>		CallbackRef;
 	typedef std::map<uint32_t, CallbackRef>	CallbackList;
 public:
-	explicit Client();
+	virtual ~Client();
 	
 	//! Connects to \a host on port number \a port.
 	virtual void		connect( const std::string &host, uint16_t port ) = 0;
@@ -39,6 +39,8 @@ public:
 		return id;
 	}
 protected:
+	explicit Client();
+	
 	CallbackList									mCallbacks;
 	boost::signals2::signal<void ( ci::Buffer )>	mSignal;
 
