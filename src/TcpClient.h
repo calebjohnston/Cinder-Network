@@ -15,7 +15,7 @@ protected:
 	typedef std::shared_ptr<boost::asio::ip::tcp::socket>	TcpSocketRef;
 	
 	TcpClient();
-	void							onSend( const std::string& message,
+	virtual void					onSend( const std::string& message,
 										   const boost::system::error_code& error,
 										   std::size_t bytesTransferred );
 

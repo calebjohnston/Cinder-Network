@@ -8,17 +8,7 @@
 using namespace ci;
 using namespace std;
 
-HttpRequest::HttpRequest( const std::string& rawHeaders )
-:	mRawHeaders(rawHeaders), mRawHeaderInvalidated(false)
-{
-}
-
-HttpRequest::~HttpRequest()
-{
-	mHeaders.clear();
-}
-
-void HttpRequest::eraseHeaderField( const string& key )
+void HttpClient::Request::eraseHeaderField( const string& key )
 {
 	KeyValueMapIter value_iter = mHeaders.find( key );
 	if ( value_iter != mHeaders.end() ) {
@@ -27,7 +17,7 @@ void HttpRequest::eraseHeaderField( const string& key )
 	}
 }
 
-string HttpRequest::getHeaderField( const string& key ) const
+string HttpClient::Request::getHeaderField( const string& key ) const
 {
 	KeyValueMapConstIter value_iter = mHeaders.find( key );
 	if ( value_iter != mHeaders.end() ) {
@@ -36,58 +26,13 @@ string HttpRequest::getHeaderField( const string& key ) const
 	else return "";
 }
 
-void HttpRequest::setHeaderField( const string& key, const string& value )
+void HttpClient::Request::setHeaderField( const string& key, const string& value )
 {
 	mHeaders[ key ] = value;
 	mRawHeaderInvalidated = true;
 }
 
-void HttpRequest::setFollowRedirect( bool value )
-{
-	//setHeaderField("","");
-}
-
-void HttpRequest::setCacheResponse( bool value )
-{
-	//setHeaderField("","");
-}
-
-void HttpRequest::setUserAgent( const std::string& value )
-{
-	//setHeaderField("","");
-}
-
-void HttpRequest::setTimeout( const uint32_t value )
-{
-	//setHeaderField("","");
-}
-
-void HttpRequest::setConnection()
-{
-	//setHeaderField("","");
-}
-
-void HttpRequest::setAcceptType( const std::string& value )
-{
-	//setHeaderField("","");
-}
-
-void HttpRequest::setAcceptCharset( const std::string& value )
-{
-	//setHeaderField("","");
-}
-
-void HttpRequest::setAcceptLanguage( const std::string& value )
-{
-	//setHeaderField("","");
-}
-
-void HttpRequest::setAcceptEncoding( const std::string& value )
-{
-	//setHeaderField("","");
-}
-
-void HttpRequest::setAuthorization( const string& username, const string& password )
+void HttpClient::Request::setAuthField( const string& username, const string& password )
 {
 	namespace boost_iters = boost::archive::iterators;
 	
@@ -104,13 +49,14 @@ void HttpRequest::setAuthorization( const string& username, const string& passwo
 }
 
 
-const string& HttpRequest::toString() const
+const string& HttpClient::Request::toString() const
 {
-	mRawHeaders = concatenateHeader();
+	if (mRawHeaderInvalidated) mRawHeaders = concatenateHeader();
+	
 	return mRawHeaders;
 }
 
-string HttpRequest::concatenateHeader() const
+string HttpClient::Request::concatenateHeader() const
 {
 	string output = mMethod + " " + mPath + " HTTP/";
 	switch ( mHttpVersion ) {
@@ -134,6 +80,30 @@ string HttpRequest::concatenateHeader() const
 	return output;
 }
 
+HttpClient::Response::Response( const std::istream& response )
+{
+	// parse...
+	
+	/*
+	string http_version, http_header, http_status;
+	response >> http_version;
+	response >> mStatusCode;
+	getline(response, http_status);
+	if (!response || http_version.substr(0, 5) != "HTTP/") {
+		// ERROR CONDITION
+		return false;
+	}
+	else if (mStatusCode != 200) {
+		return false;
+	}
+	*/
+}
+
+HttpClient::Response::Response( const std::string& content )
+{
+	// parse...
+}
+
 HttpClientRef HttpClient::create()
 {
 	return HttpClientRef( new HttpClient() );
@@ -155,29 +125,51 @@ void HttpClient::connect( const string& host, uint16_t port )
 
 void HttpClient::send( const string& path, const string& method, uint_fast8_t* buffer, size_t count )
 {
-	/*
-	bool concat = path != mPath || method != mMethod;
-	mPath	= path;
-	mMethod	= method;
-	if ( concat ) {
-		concatenateHeader();
-	}
-	*/
-	sendImpl( buffer, count );
-}
-
-void HttpClient::send( const HttpRequest& request )
-{
+	Request req;
+	req.setPath(path);
+	req.setMethod(method);
+	mHeader = req.toString();
 	
+	sendImpl( buffer, count );
 }
 
 void HttpClient::send( const std::string& header )
 {
+	mHeader = header;
+}
+
+void HttpClient::send( const Request& request )
+{
+	mHeader = request.toString();
+}
+
+void HttpClient::onSend(const string& message, const boost::system::error_code& error, size_t bytesTransferred)
+{
+	if (error) {
+		throw ExcHttpError(error.message());
+	}
 	
+	if ( mSocket ) {
+		boost::system::error_code err;
+		// is this how we'll get a return??
+		boost::asio::streambuf response;
+		std::istream responseStream(&response);
+		size_t bytes_read = boost::asio::read_until(*mSocket.get(), response, "\r\n", err);
+		
+		if (err) {
+			throw ExcHttpError(err.message());
+			return;
+		}
+		
+		Response res(responseStream);
+		// flip
+	}
 }
 
 void HttpClient::sendImpl( uint_fast8_t* buffer, size_t count )
 {
+	if ( !mSocket ) return;
+	
 	// Append header to buffer
 	size_t headerSize			= mHeader.size() * sizeof( uint_fast8_t );
 	size_t total				= count + headerSize;
@@ -186,20 +178,18 @@ void HttpClient::sendImpl( uint_fast8_t* buffer, size_t count )
 	
 	// TODO separator
 	
-	memcpy( &headerBuffer[ headerSize ], buffer, count );
-	
-	if ( mSocket ) {
-		mSocket->async_send( boost::asio::buffer( headerBuffer, total ),
-							boost::bind(& HttpClient::onSend, this, "", boost::asio::placeholders::error, count )
-							);
+	if ( buffer && count ) {
+		memcpy( &headerBuffer[ headerSize ], buffer, count );
 	}
+	
+	mSocket->async_send( boost::asio::buffer( headerBuffer, total ), boost::bind(&HttpClient::onSend, this, "", boost::asio::placeholders::error, count ) );
 	
 	delete [] headerBuffer;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HttpClient::ExcHeaderNotFound::ExcHeaderNotFound( const string& msg ) throw()
+HttpClient::ExcHttpError::ExcHttpError( const string& msg ) throw()
 {
-	sprintf( mMessage, "Header field not found: %s", msg.c_str() );
+	sprintf( mMessage, "Http response error %s", msg.c_str() );
 }
