@@ -13,6 +13,7 @@
 		00B784B50FF439BC000DE1D7 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B10FF439BC000DE1D7 /* AudioUnit.framework */; };
 		00B784B60FF439BC000DE1D7 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B20FF439BC000DE1D7 /* CoreAudio.framework */; };
 		343EF4E06FF341EF9A78DA51 /* ClientApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E3D5E373F4DE4E91A2494A2F /* ClientApp.cpp */; };
+		3C498BF3171B9CEA00E68F49 /* HttpStreamingClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C498BF1171B9CEA00E68F49 /* HttpStreamingClient.cpp */; };
 		5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B10EAFCA74003A9687 /* CoreVideo.framework */; };
 		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -23,7 +24,6 @@
 		AE97A0091714993000BCE796 /* SmtpClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE979FFE1714993000BCE796 /* SmtpClient.cpp */; };
 		AE97A00A1714993000BCE796 /* TcpClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE97A0001714993000BCE796 /* TcpClient.cpp */; };
 		AE97A00B1714993000BCE796 /* UdpClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE97A0021714993000BCE796 /* UdpClient.cpp */; };
-		AE97A00C1714993000BCE796 /* WebSocketClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE97A0041714993000BCE796 /* WebSocketClient.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +38,8 @@
 		1673B02EE96945BB965A1689 /* Resources.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Resources.h; path = ../include/Resources.h; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		3C498BF1171B9CEA00E68F49 /* HttpStreamingClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HttpStreamingClient.cpp; path = ../../../src/HttpStreamingClient.cpp; sourceTree = "<group>"; };
+		3C498BF2171B9CEA00E68F49 /* HttpStreamingClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HttpStreamingClient.h; path = ../../../src/HttpStreamingClient.h; sourceTree = "<group>"; };
 		5323E6B10EAFCA74003A9687 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = /System/Library/Frameworks/CoreVideo.framework; sourceTree = "<absolute>"; };
 		5323E6B50EAFCA7E003A9687 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		8D1107320486CEB800E47090 /* Client.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Client.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -169,6 +171,8 @@
 		AE979FF71714991B00BCE796 /* Cinder-Network */ = {
 			isa = PBXGroup;
 			children = (
+				3C498BF1171B9CEA00E68F49 /* HttpStreamingClient.cpp */,
+				3C498BF2171B9CEA00E68F49 /* HttpStreamingClient.h */,
 				AE979FF81714993000BCE796 /* Client.cpp */,
 				AE979FF91714993000BCE796 /* Client.h */,
 				AE979FFA1714993000BCE796 /* FtpClient.cpp */,
@@ -255,7 +259,7 @@
 				AE97A0091714993000BCE796 /* SmtpClient.cpp in Sources */,
 				AE97A00A1714993000BCE796 /* TcpClient.cpp in Sources */,
 				AE97A00B1714993000BCE796 /* UdpClient.cpp in Sources */,
-				AE97A00C1714993000BCE796 /* WebSocketClient.cpp in Sources */,
+				3C498BF3171B9CEA00E68F49 /* HttpStreamingClient.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,7 +319,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				CINDER_PATH = ../../../../..;
+				CINDER_PATH = "../../../../Cinder/cinder-appRewrite";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -332,7 +336,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				CINDER_PATH = ../../../../..;
+				CINDER_PATH = "../../../../Cinder/cinder-appRewrite";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;

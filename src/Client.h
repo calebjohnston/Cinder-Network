@@ -15,7 +15,7 @@ private:
 	typedef std::shared_ptr<Callback>		CallbackRef;
 	typedef std::map<uint32_t, CallbackRef>	CallbackList;
 public:
-	virtual ~Client();
+	virtual ~Client() {}
 	
 	//! Connects to \a host on port number \a port.
 	virtual void		connect( const std::string &host, const uint16_t port ) = 0;

@@ -3,6 +3,8 @@
 #include <boost/archive/iterators/transform_width.hpp>
 #include <boost/archive/iterators/ostream_iterator.hpp>
 
+#include "cinder/Utilities.h"
+
 #include "HttpClient.h"
 
 using namespace ci;
@@ -80,26 +82,39 @@ string HttpClient::Request::concatenateHeader() const
 	return output;
 }
 
-HttpClient::Response::Response( const std::istream& response )
+
+void HttpClient::Request::setData( const ci::Buffer& data, const std::string& contentType )
 {
-	// parse...
+	if (!contentType.empty()) {
+		setHeaderField("Content-Type", contentType);
+	}
 	
-	/*
+	mData = data;
+}
+
+HttpClient::Response::Response( std::istream& response )
+{
+	std::list<std::string> header_lines;
+	
 	string http_version, http_header, http_status;
 	response >> http_version;
 	response >> mStatusCode;
-	getline(response, http_status);
-	if (!response || http_version.substr(0, 5) != "HTTP/") {
-		// ERROR CONDITION
-		return false;
+	response >> http_status;
+	while (getline(response, http_header)){
+		header_lines.push_back(http_header);
 	}
-	else if (mStatusCode != 200) {
-		return false;
+	for (std::list<std::string>::iterator itr = header_lines.begin(); itr != header_lines.end(); ++itr) {
+		vector<string> keyValuePair = split(*itr, ":");
+		if (keyValuePair.size() < 2) continue;
+		
+		string key = keyValuePair.at(0);
+		string value = keyValuePair.at(1);
+		mHeaders[ key ] = value;
+		std::cout << keyValuePair.size() << " " << key << ": " << value << std::endl;
 	}
-	*/
 }
 
-HttpClient::Response::Response( const std::string& content )
+HttpClient::Response::Response( std::string& content )
 {
 	// parse...
 }
@@ -133,56 +148,96 @@ void HttpClient::send( const string& path, const string& method, uint_fast8_t* b
 	sendImpl( buffer, count );
 }
 
-void HttpClient::send( const std::string& header )
+void HttpClient::send( const std::string& header, uint_fast8_t* buffer, size_t count )
 {
 	mHeader = header;
+	
+	sendImpl( buffer, count );
 }
 
-void HttpClient::send( const Request& request )
+void HttpClient::send( const Request& request, const ci::Buffer& data )
 {
 	mHeader = request.toString();
+	
+	uint_fast8_t* buffer;
+	size_t count;
+	if (data) {
+		buffer = (uint_fast8_t*) data.getData();
+		count = data.getDataSize();
+	}
+	else if (request.mData) {
+		buffer = (uint_fast8_t*) request.mData.getData();
+		count = request.mData.getDataSize();
+	}
+	else {
+		buffer = 0;
+		count = 0;
+	}
+	
+	sendImpl( buffer, count );
 }
 
-void HttpClient::onSend(const string& message, const boost::system::error_code& error, size_t bytesTransferred)
+void HttpClient::onSend( const string& message, const boost::system::error_code& error, size_t bytesTransferred )
 {
 	if (error) {
 		throw ExcHttpError(error.message());
 	}
+	else if (bytesTransferred == 0) {
+		throw ExcHttpError("HTTP send failed.");
+	}
 	
 	if ( mSocket ) {
+		/*
 		boost::system::error_code err;
 		// is this how we'll get a return??
-		boost::asio::streambuf response;
-		std::istream responseStream(&response);
-		size_t bytes_read = boost::asio::read_until(*mSocket.get(), response, "\r\n", err);
+		boost::asio::streambuf response_buffer;
+		std::istream response_stream(&response_buffer);
+		size_t bytes_read = boost::asio::read_until(*mSocket.get(), response_buffer, "\r\n", err);
 		
 		if (err) {
 			throw ExcHttpError(err.message());
-			return;
 		}
-		
-		Response res(responseStream);
-		// flip
+		else if (bytes_read == 0) {
+			throw ExcHttpError("HTTP recieve failed.");
+		}
+		 */
+	}
+	else {
+		// auto connect???
 	}
 }
 
 void HttpClient::sendImpl( uint_fast8_t* buffer, size_t count )
 {
-	if ( !mSocket ) return;
+	if ( !mSocket ) return; // auto connect???
 	
+	mHeader += "\r\n";
 	// Append header to buffer
 	size_t headerSize			= mHeader.size() * sizeof( uint_fast8_t );
 	size_t total				= count + headerSize;
 	uint_fast8_t* headerBuffer	= new uint_fast8_t[ total ];
 	memcpy( headerBuffer, &mHeader[ 0 ], headerSize );
 	
-	// TODO separator
-	
 	if ( buffer && count ) {
 		memcpy( &headerBuffer[ headerSize ], buffer, count );
 	}
 	
-	mSocket->async_send( boost::asio::buffer( headerBuffer, total ), boost::bind(&HttpClient::onSend, this, "", boost::asio::placeholders::error, count ) );
+	boost::asio::streambuf request_buffer;
+	std::ostream request_stream(&request_buffer);
+	request_stream << mHeader;
+	boost::asio::write(*mSocket.get(), request_buffer);
+//	mSocket->async_send( boost::asio::buffer( headerBuffer, total ), boost::bind(&HttpClient::onSend, this, std::_1, std::_2) );
+	
+	// ***TEMPORARY***
+	//-----------------------------------
+	boost::system::error_code err;
+	boost::asio::streambuf response_buffer;
+	std::istream response_stream(&response_buffer);
+	boost::asio::read_until(*mSocket.get(), response_buffer, "\r\n", err);
+	//-----------------------------------
+	
+	Response response(response_stream);
+	//dispatch the response object/event
 	
 	delete [] headerBuffer;
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/asio/buffer.hpp>
+
 #include "TcpClient.h"
 
 typedef std::shared_ptr<class HttpClient> HttpClientRef;
@@ -27,9 +29,9 @@ public:
 	virtual void			send( const std::string& path, const std::string& method,
 								 uint_fast8_t* buffer = 0, size_t count = 0 );
 	
-	virtual void			send( const std::string& header );
+	virtual void			send( const std::string& header, uint_fast8_t* buffer = 0, size_t count = 0 );
 				
-	virtual void			send( const Request& request );
+	virtual void			send( const Request& request, const ci::Buffer& data = ci::Buffer() );
 	
 	const std::string&		getHeader() const { return mHeader; }
 	
@@ -69,7 +71,7 @@ public:
 		void setAuthField( const std::string& username, const std::string& password );
 		
 		//! for POST requests
-		void setData( const ci::Buffer& data, const std::string& contentType );
+		void setData( const ci::Buffer& data, const std::string& contentType = "" );
 		
 		const std::string& toString() const;
 		
@@ -100,8 +102,9 @@ public:
 		inline const ci::Buffer& getContent() const { return mData; }
 		
 	protected:
-		Response( const std::istream& response );
-		Response( const std::string& content );
+		Response( std::istream& response );
+		Response( std::string& content );
+		
 		std::string mRawHeaders;
 		KeyValueMap	mHeaders;
 		ci::Buffer mData;
