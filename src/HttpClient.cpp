@@ -94,12 +94,18 @@ void HttpClient::Request::setData( const ci::Buffer& data, const std::string& co
 
 HttpClient::Response::Response( std::istream& response )
 {
+	// WARNING This parsing method is really lazy and dumb, but it works well enough for a demo
 	std::list<std::string> header_lines;
 	
 	string http_version, http_header, http_status;
 	response >> http_version;
 	response >> mStatusCode;
 	response >> http_status;
+	
+	//-- TEST! ---------------------
+	app::console() << "Response status code " << mStatusCode << std::endl;
+	//------------------------------
+	
 	while (getline(response, http_header)){
 		header_lines.push_back(http_header);
 	}
@@ -110,7 +116,11 @@ HttpClient::Response::Response( std::istream& response )
 		string key = keyValuePair.at(0);
 		string value = keyValuePair.at(1);
 		mHeaders[ key ] = value;
-		std::cout << keyValuePair.size() << " " << key << ": " << value << std::endl;
+		
+		
+		//-- TEST! ---------------------
+		app::console() << key << ": " << value << std::endl;
+		//------------------------------
 	}
 }
 
