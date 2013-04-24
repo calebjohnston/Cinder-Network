@@ -1,7 +1,5 @@
 #include "Connection.h"
 
-#include "cinder/Buffer.h"
-
 using namespace ci;
 using namespace std;
 
@@ -25,7 +23,10 @@ void Connection::onRead( const boost::system::error_code& error, size_t bytesTra
 	if ( error ) {
 		mSignalError( error.message(), bytesTransferred );
 	} else {
-		mSignalRead( readBuffer( mResponse, bytesTransferred ) );
+		istream stream( &mResponse );
+		char data[ bytesTransferred ];
+		stream.read( data, bytesTransferred );
+		mSignalRead( Buffer( data, bytesTransferred ) );
 	}
 	mResponse.commit( bytesTransferred );
 }
@@ -35,17 +36,12 @@ void Connection::onWrite( const boost::system::error_code& error, size_t bytesTr
 	if ( error ) {
 		mSignalError( error.message(), bytesTransferred );
 	} else {
-		mSignalWrite( readBuffer( mRequest, bytesTransferred ) );
+		istream stream( &mRequest );
+		char data[ bytesTransferred ];
+		stream.read( data, bytesTransferred );
+		mSignalWrite( Buffer( data, bytesTransferred ) );
 	}
 	mRequest.consume( bytesTransferred );
-}
-
-Buffer Connection::readBuffer( boost::asio::streambuf& buffer, size_t count )
-{
-	istream stream( &buffer );
-	char data[ count ];
-	stream.read( data, count );
-	return Buffer( data, count );
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
