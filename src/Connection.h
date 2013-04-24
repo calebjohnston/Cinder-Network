@@ -65,18 +65,19 @@ protected:
 	explicit					Connection( boost::asio::io_service& io );
 
 	CallbackList											mCallbacks;
-	boost::signals2::signal<void ( ci::Buffer )>			mSignalRead;
 	boost::signals2::signal<void ( std::string, size_t )>	mSignalError;
+	boost::signals2::signal<void ( ci::Buffer )>			mSignalRead;
 	boost::signals2::signal<void ( ci::Buffer )>			mSignalWrite;
 	
 	bool						mConnected;
 	uint16_t					mPort;
 
-	ci::Buffer					readBuffer( boost::asio::streambuf& buffer, size_t count );
-	
+	ci::Buffer					mBufferRequest;
+	ci::Buffer					mBufferResponse;
 	boost::asio::io_service&	mIoService;
 	boost::asio::streambuf		mRequest;
 	boost::asio::streambuf		mResponse;
+	char*						readBuffer( boost::asio::streambuf& buffer, size_t count );
 	
 	virtual void				onRead( const boost::system::error_code& error,
 									   size_t bytesTransferred );
