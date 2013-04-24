@@ -1,6 +1,5 @@
 #include "UdpClient.h"
 
-#include "cinder/app/App.h"
 #include "boost/bind.hpp"
 #include "cinder/Utilities.h"
 
@@ -8,21 +7,22 @@ using boost::asio::ip::udp;
 using namespace ci;
 using namespace std;
 
-UdpClientRef UdpClient::create()
+UdpClientRef UdpClient::create( boost::asio::io_service& io )
 {
-	return UdpClientRef( new UdpClient() );
+	return UdpClientRef( new UdpClient( io ) );
 }
 
-UdpClient::UdpClient()
-: Client()
+UdpClient::UdpClient( boost::asio::io_service& io )
+: Client( io )
 {
 }
 
 UdpClient::~UdpClient()
 {
-	if ( mSocket && mSocket->is_open() ) {
-		mSocket->close();
+	if ( !mIoService.stopped() ) {
+		mIoService.stop();
 	}
+	disconnect();
 }
 
 void UdpClient::connect( const string& host, uint16_t port )
@@ -49,22 +49,23 @@ void UdpClient::connect( const string& host, uint16_t port )
 		mSocket->connect( mEndpoint );
 		mIoService.run();
 		mConnected = true;
-
 	} catch ( const std::exception& ex ) {
-		throw ExcConnection( ex.what() );
+		throw ExcConnectionFailed( ex.what() );
 	}
 }
 
-void UdpClient::onSend( const string& message, const boost::system::error_code& error, 
-	std::size_t bytesTransferred )
+void UdpClient::disconnect()
+{
+	mConnected = false;
+	if ( mSocket && mSocket->is_open() ) {
+		mSocket->close();
+	}
+}
+
+void UdpClient::read()
 {
 }
 
-void UdpClient::sendImpl( uint_fast8_t* buffer, size_t count )
+void UdpClient::write( const ci::Buffer& buffer )
 {
-	if ( mSocket ) {
-		mSocket->async_send( boost::asio::buffer( buffer, count ), 
-			boost::bind(& UdpClient::onSend, this, "", boost::asio::placeholders::error, count ) 
-			);
-	}
 }
