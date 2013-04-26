@@ -1,53 +1,47 @@
 #include "Connection.h"
 
+#include "cinder/Utilities.h"
+
 using namespace ci;
 using namespace std;
 
 Connection::Connection( boost::asio::io_service& io )
-: mConnected( false ), mIoService( io ), mPort( 0 )
+: mIoService( io ), mProtocol( "" )
 {
 }
 
-bool Connection::isConnected() const
+void Connection::removeCallback( uint32_t id )
 {
-	return mConnected;
+	if ( mCallbacks.find( id ) != mCallbacks.end() ) {
+		mCallbacks.find( id )->second->disconnect();
+		mCallbacks.erase( id );
+	}
 }
 
-uint16_t Connection::getPort() const
+void Connection::onWrite( const boost::system::error_code& err, size_t bytesTransferred )
 {
-	return mPort;
-}
-
-void Connection::onRead( const boost::system::error_code& error, size_t bytesTransferred )
-{
-	if ( error ) {
-		mSignalError( error.message(), bytesTransferred );
+	if ( err ) {
+		mSignalError( err.message(), bytesTransferred );
 	} else {
-		istream stream( &mResponse );
+		mSignalWrite( bytesTransferred );
+	}
+}
+
+void Connection::onRead( const boost::system::error_code& err, size_t bytesTransferred )
+{
+	if ( err ) {
+		if ( err == boost::asio::error::eof ) {
+			mSignalReadComplete();
+			mIoService.stop();
+			mIoService.poll();
+		} else {
+			mSignalError( err.message(), bytesTransferred );
+		}
+	} else {
 		char data[ bytesTransferred ];
+		istream stream( &mResponse );
 		stream.read( data, bytesTransferred );
 		mSignalRead( Buffer( data, bytesTransferred ) );
 	}
-	mResponse.commit( bytesTransferred );
+	mResponse.consume( bytesTransferred );
 }
-
-void Connection::onWrite( const boost::system::error_code& error, size_t bytesTransferred )
-{
-	if ( error ) {
-		mSignalError( error.message(), bytesTransferred );
-	} else {
-		istream stream( &mRequest );
-		char data[ bytesTransferred ];
-		stream.read( data, bytesTransferred );
-		mSignalWrite( Buffer( data, bytesTransferred ) );
-	}
-	mRequest.consume( bytesTransferred );
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Connection::ExcConnectionFailed::ExcConnectionFailed( const string& msg ) throw()
-{
-	sprintf( mMessage, "Unable to connect: %s", msg.c_str() );
-}
- 

@@ -8,21 +8,21 @@ typedef std::shared_ptr<boost::asio::ip::udp::socket>	UdpSocketRef;
 class UdpClient : public Client
 {
 public:
-	static UdpClientRef				create( boost::asio::io_service& io );
-	~UdpClient();
+	static UdpClientRef	create( boost::asio::io_service& io );
 	
-	virtual void					connect( const std::string& host = "localhost", uint16_t port = 2000 );
-	void							disconnect();
+	void				connect( const std::string& host, uint16_t port );
+	void				connect( const std::string& host, const std::string& protocol );
+	void				disconnect();
 	
-	virtual void					read();
-	virtual void					read( size_t bufferSize );
-	virtual void					read( const std::string& delimiter );
-	virtual void					write( const ci::Buffer& buffer );
+	void				read();
+	
+	void				write( const ci::Buffer& buffer );
 protected:
-									UdpClient( boost::asio::io_service& io );
+	UdpClient( boost::asio::io_service& io );
 	
-	boost::asio::ip::udp::endpoint	mEndpoint;
-	boost::asio::io_service			mIoService;
-	UdpSocketRef					mSocket;
-
+	void				onConnect( const boost::system::error_code& err );
+	void				onResolve( const boost::system::error_code& err,
+								  boost::asio::ip::udp::resolver::iterator iter );
+	
+	UdpSocketRef		mSocket;
 };
