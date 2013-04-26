@@ -8,21 +8,24 @@ typedef std::shared_ptr<boost::asio::ip::tcp::socket>	TcpSocketRef;
 class TcpClient : public Client
 {
 public:
-	static TcpClientRef				create( boost::asio::io_service& io );
+	static TcpClientRef	create( boost::asio::io_service& io );
 	~TcpClient();
 	
-	virtual void					connect( const std::string& host = "localhost", uint16_t port = 2000 );
-	void							disconnect();
+	void				connect( const std::string& host, uint16_t port );
+	void				connect( const std::string& host, const std::string& protocol );
+	void				disconnect();
 	
-	TcpSocketRef					getSocket() const;
+	void				read();
+	void				read( const std::string& until );
+	void				read( size_t bufferSize );
 	
-	virtual void					read();
-	virtual void					read( size_t bufferSize );
-	virtual void					read( const std::string& delimiter );
-	virtual void					write( const ci::Buffer& buffer );
+	void				write( const ci::Buffer& buffer );
 protected:
-									TcpClient( boost::asio::io_service& io );
+	TcpClient( boost::asio::io_service& io );
 	
-	boost::asio::ip::tcp::endpoint	mEndpoint;
-	TcpSocketRef					mSocket;
+	void				onConnect( const boost::system::error_code& err );
+	void				onResolve( const boost::system::error_code& err,
+								  boost::asio::ip::tcp::resolver::iterator iter );
+	
+	TcpSocketRef		mSocket;
 };

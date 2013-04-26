@@ -5,13 +5,13 @@
 class Client : public Connection
 {
 public:
-	//! Connects socket to remote \a host on port number \a port.
-	virtual void		connect( const std::string &host, uint16_t port ) = 0;
-	
-	//! Returns host as string.
-	const std::string&	getHost() const;
+	virtual void	connect( const std::string& host, uint16_t port ) = 0;
+	virtual void	connect( const std::string& host, const std::string& protocol ) = 0;
 protected:
-	explicit			Client( boost::asio::io_service& io );
+	Client( boost::asio::io_service& io )
+	: Connection( io ), mHost( "" )
+	{
+	}
 	
-	std::string			mHost;
+	std::string		mHost;
 };
