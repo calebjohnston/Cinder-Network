@@ -47,12 +47,5 @@ void Connection::onRead( const boost::system::error_code& err, size_t bytesTrans
 		stream.read( data, bytesTransferred );
 		mSignalRead( Buffer( data, bytesTransferred ) );
 	}
-	clearBuffer( mResponse );
-}
-
-void Connection::clearBuffer( boost::asio::streambuf& buffer )
-{
-	ostream stream( &buffer );
-	stream.clear();
-	buffer.consume( buffer.size() );
+	mResponse.consume( mResponse.size() );
 }

@@ -83,7 +83,7 @@ void TcpClient::write( const Buffer& buffer )
 							 boost::bind( &TcpClient::onWrite, this,
 										 boost::asio::placeholders::error,
 										 boost::asio::placeholders::bytes_transferred ) );
-	clearBuffer( mRequest );
+	mRequest.consume( mRequest.size() );
 }
 
 void TcpClient::onConnect( const boost::system::error_code& err )
