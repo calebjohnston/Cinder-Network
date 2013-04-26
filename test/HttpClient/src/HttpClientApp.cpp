@@ -90,6 +90,8 @@ void HttpClientApp::onWrite( ci::Buffer buffer )
 
 void HttpClientApp::send()
 {
+	console() << "Connecting to: " << mHost << ":" << mPort << endl;
+	
 	mClient->connect( mHost, mPort );
 }
 
