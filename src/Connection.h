@@ -72,6 +72,7 @@ protected:
 	
 	std::string					mProtocol;
 	
+	void						clearBuffer( boost::asio::streambuf& buffer );
 	boost::asio::io_service&	mIoService;
 	boost::asio::streambuf		mRequest;
 	boost::asio::streambuf		mResponse;

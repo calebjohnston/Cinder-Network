@@ -46,6 +46,7 @@ void HttpClientApp::draw()
 void HttpClientApp::onConnect()
 {
 	console() << "Connected." << endl;
+	mResponse.clear();
 	mClient->write( Buffer( &mRequest[ 0 ], mRequest.size() ) );
 }
 

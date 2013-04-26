@@ -24,8 +24,6 @@ void Connection::removeCallback( uint32_t id )
 
 void Connection::onWrite( const boost::system::error_code& err, size_t bytesTransferred )
 {
-	ostream stream( &mRequest );
-	stream.clear();
 	if ( err ) {
 		mSignalError( err.message(), bytesTransferred );
 	} else {
@@ -45,11 +43,16 @@ void Connection::onRead( const boost::system::error_code& err, size_t bytesTrans
 		}
 	} else {
 		char data[ bytesTransferred ];
-		{
-			istream stream( &mResponse );
-			stream.read( data, bytesTransferred );
-		}
+		istream stream( &mResponse );
+		stream.read( data, bytesTransferred );
 		mSignalRead( Buffer( data, bytesTransferred ) );
-		mResponse.consume( mResponse.size() );
 	}
+	clearBuffer( mResponse );
+}
+
+void Connection::clearBuffer( boost::asio::streambuf& buffer )
+{
+	ostream stream( &buffer );
+	stream.clear();
+	buffer.consume( buffer.size() );
 }
