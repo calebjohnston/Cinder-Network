@@ -20,6 +20,8 @@ TcpClient::TcpClient( boost::asio::io_service& io )
 TcpClient::~TcpClient()
 {
 	disconnect();
+	
+	mIoService.stop();
 }
 
 void TcpClient::connect( const string& host, uint16_t port )

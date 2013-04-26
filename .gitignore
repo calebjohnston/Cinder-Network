@@ -1,4 +1,5 @@
 .DS_Store
-xcuserdata
 build
-DerivedData
+Caleb.xcuserdatad
+/test/Client/xcode/HttpClient.xcodeproj/xcuserdata/
+xcuserdata

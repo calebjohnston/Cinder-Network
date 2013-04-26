@@ -95,6 +95,8 @@ void HttpClientApp::onWrite( size_t bytesTransferred )
 
 void HttpClientApp::send()
 {
+	console() << "Connecting to: " << mHost << ":" << mPort << endl;
+	
 	mClient->connect( mHost, mPort );
 }
 
