@@ -21,7 +21,7 @@ private:
 	void						onRead( ci::Buffer buffer );
 	void						onReadComplete();
 	void						onResolve();
-	void						onWrite( ci::Buffer buffer );
+	void						onWrite( size_t bytesTransferred );
 	
 	std::string					mResponse;
 	
@@ -91,12 +91,9 @@ void WebSocketClientApp::onResolve()
 	console() << "Endpoint resolved." << endl;
 }
 
-void WebSocketClientApp::onWrite( ci::Buffer buffer )
+void WebSocketClientApp::onWrite( size_t bytesTransferred )
 {
-	console() << buffer.getDataSize() << " bytes written." << endl << endl;
-	
-	string request( static_cast<const char*>( buffer.getData() ) );
-	console() << request << endl;
+	console() << bytesTransferred << " bytes written." << endl << endl;
 	
 	mClient->read();
 }
@@ -114,7 +111,7 @@ void WebSocketClientApp::setup()
 	mHost		= "echo.websocket.org";
 	mPort		= 80;
 	
-	mHandshake += "GET /?encoding=text HTTP/1.1\r\n";
+	mHandshake = "GET /?encoding=text HTTP/1.1\r\n";
 	mHandshake += "Upgrade: websocket\r\n";
 	mHandshake += "Connection: Upgrade\r\n";
 	mHandshake += "Host: " + mHost + "\r\n";

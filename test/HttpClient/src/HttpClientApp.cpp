@@ -21,7 +21,7 @@ private:
 	void						onRead( ci::Buffer buffer );
 	void						onReadComplete();
 	void						onResolve();
-	void						onWrite( ci::Buffer buffer );
+	void						onWrite( size_t bytesTransferred );
 	
 	std::string					mResponse;
 	
@@ -82,12 +82,9 @@ void HttpClientApp::onResolve()
 	console() << "Endpoint resolved." << endl;
 }
 
-void HttpClientApp::onWrite( ci::Buffer buffer )
+void HttpClientApp::onWrite( size_t bytesTransferred )
 {
-	console() << buffer.getDataSize() << " bytes written." << endl << endl;
-	
-	string request( static_cast<const char*>( buffer.getData() ) );
-	console() << request << endl;
+	console() << bytesTransferred << " bytes written." << endl;
 	
 	mClient->read();
 }
