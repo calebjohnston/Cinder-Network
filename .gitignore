@@ -1,3 +1,5 @@
 .DS_Store
 build
 Caleb.xcuserdatad
+/test/Client/xcode/HttpClient.xcodeproj/xcuserdata/
+xcuserdata
