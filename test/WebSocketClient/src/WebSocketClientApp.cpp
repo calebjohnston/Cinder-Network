@@ -3,7 +3,7 @@
 
 #include "TcpClient.h"
 
-class HttpClientApp : public ci::app::AppBasic 
+class WebSocketClientApp : public ci::app::AppBasic 
 {
 public:
 	void						draw();
@@ -11,9 +11,9 @@ public:
 	void						update();
 private:
 	TcpClientRef				mClient;
+	std::string					mHandshake;
 	std::string					mHost;
 	uint16_t					mPort;
-	std::string					mRequest;
 	void						send();
 	
 	void						onConnect();
@@ -36,34 +36,43 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-void HttpClientApp::draw()
+void WebSocketClientApp::draw()
 {
 	gl::clear( Colorf::black() );
 	
 	mParams->draw();
 }
 
-void HttpClientApp::onConnect()
+void WebSocketClientApp::onConnect()
 {
 	console() << "Connected." << endl;
 	mResponse.clear();
-	mClient->write( Buffer( &mRequest[ 0 ], mRequest.size() ) );
+	if ( !mHandshake.empty() ) {
+		mClient->write( Buffer( &mHandshake[ 0 ], mHandshake.size() ) );
+		mHandshake.clear();
+	} else {
+		string echo( "echo" );
+		mClient->write( Buffer( &echo[ 0 ], 4 ) );
+	}
 }
 
-void HttpClientApp::onError( string error, size_t bytesTransferred )
+void WebSocketClientApp::onError( string error, size_t bytesTransferred )
 {
 	console() << "Error: " << error << "." << endl;
 }
 
-void HttpClientApp::onReadComplete()
+void WebSocketClientApp::onReadComplete()
 {
 	console() << "Read complete." << endl;
 	console() << mResponse << endl;
 	
+	// TODO process response
+	mResponse.clear();
+	
 	mClient->disconnect();
 }
 
-void HttpClientApp::onRead( ci::Buffer buffer )
+void WebSocketClientApp::onRead( ci::Buffer buffer )
 {
 	console() << buffer.getDataSize() << " bytes read." << endl;
 	
@@ -77,12 +86,12 @@ void HttpClientApp::onRead( ci::Buffer buffer )
 	mClient->read();
 }
 
-void HttpClientApp::onResolve()
+void WebSocketClientApp::onResolve()
 {
 	console() << "Endpoint resolved." << endl;
 }
 
-void HttpClientApp::onWrite( ci::Buffer buffer )
+void WebSocketClientApp::onWrite( ci::Buffer buffer )
 {
 	console() << buffer.getDataSize() << " bytes written." << endl << endl;
 	
@@ -92,42 +101,48 @@ void HttpClientApp::onWrite( ci::Buffer buffer )
 	mClient->read();
 }
 
-void HttpClientApp::send()
+void WebSocketClientApp::send()
 {
 	mClient->connect( mHost, mPort );
 }
 
-void HttpClientApp::setup()
+void WebSocketClientApp::setup()
 {	
 	mFrameRate	= 0.0f;
 	mFullScreen	= false;
 	
-	mHost		= "libcinder.org";
+	mHost		= "echo.websocket.org";
 	mPort		= 80;
 	
-	mRequest = "GET / HTTP/1.0\r\n";
-	mRequest += "Host: " + mHost + "\r\n";
-	mRequest += "Accept: */*\r\n";
-	mRequest += "Connection: close\r\n\r\n";
-	
+	mHandshake += "GET /?encoding=text HTTP/1.1\r\n";
+	mHandshake += "Upgrade: websocket\r\n";
+	mHandshake += "Connection: Upgrade\r\n";
+	mHandshake += "Host: " + mHost + "\r\n";
+	mHandshake += "Origin: WebSocketClient\r\n";
+	mHandshake += "Pragma: no-cache\r\n";
+	mHandshake += "Cache-Control: no-cache\r\n";
+	mHandshake += "Sec-WebSocket-Key: e0ReqUBOu8zyDInE07NrrA==\r\n";
+	mHandshake += "Sec-WebSocket-Version: 13\r\n";
+	mHandshake += "Sec-WebSocket-Extensions: x-webkit-deflate-frame\r\n";
+
 	mParams = params::InterfaceGl::create( "Params", Vec2i( 200, 150 ) );
 	mParams->addParam( "Frame rate",	&mFrameRate,					"", true );
 	mParams->addParam( "Full screen",	&mFullScreen,					"key=f" );
-	mParams->addButton( "Send", bind(	&HttpClientApp::send, this ),	"key=s" );
-	mParams->addButton( "Quit", bind(	&HttpClientApp::quit, this ),	"key=q" );
+	mParams->addButton( "Send", bind(	&WebSocketClientApp::send, this ),	"key=s" );
+	mParams->addButton( "Quit", bind(	&WebSocketClientApp::quit, this ),	"key=q" );
 	
 	mClient = TcpClient::create( io_service() );
-	mClient->addConnectCallback( &HttpClientApp::onConnect, this );
-	mClient->addErrorCallback( &HttpClientApp::onError, this );
-	mClient->addReadCallback( &HttpClientApp::onRead, this );
-	mClient->addReadCompleteCallback( &HttpClientApp::onReadComplete, this );
-	mClient->addResolveCallback( &HttpClientApp::onResolve, this );
-	mClient->addWriteCallback( &HttpClientApp::onWrite, this );
+	mClient->addConnectCallback( &WebSocketClientApp::onConnect, this );
+	mClient->addErrorCallback( &WebSocketClientApp::onError, this );
+	mClient->addReadCallback( &WebSocketClientApp::onRead, this );
+	mClient->addReadCompleteCallback( &WebSocketClientApp::onReadComplete, this );
+	mClient->addResolveCallback( &WebSocketClientApp::onResolve, this );
+	mClient->addWriteCallback( &WebSocketClientApp::onWrite, this );
 	
 	send();
 }
 
-void HttpClientApp::update()
+void WebSocketClientApp::update()
 {
 	mFrameRate = getFrameRate();
 	
@@ -137,4 +152,4 @@ void HttpClientApp::update()
 	}
 }
 
-CINDER_APP_BASIC( HttpClientApp, RendererGl )
+CINDER_APP_BASIC( WebSocketClientApp, RendererGl )
