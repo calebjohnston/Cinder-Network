@@ -68,7 +68,9 @@ void HttpClientApp::onRead( ci::Buffer buffer )
 	console() << buffer.getDataSize() << " bytes read." << endl;
 	
 	string response( static_cast<const char*>( buffer.getData() ) );
-	response.pop_back();
+	for ( size_t i = 0; i < 5; ++i ) {
+		response.pop_back(); // Discard the last five bytes
+	}
 	mResponse += response;
 	
 	mClient->read();
