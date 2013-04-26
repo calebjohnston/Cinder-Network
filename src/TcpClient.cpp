@@ -41,6 +41,7 @@ void TcpClient::connect( const string& host, const string& protocol )
 	resolver.async_resolve( query, boost::bind( &TcpClient::onResolve, this,
 											   boost::asio::placeholders::error,
 											   boost::asio::placeholders::iterator ) );
+	mIoService.reset();
 	mIoService.run();
 }
 

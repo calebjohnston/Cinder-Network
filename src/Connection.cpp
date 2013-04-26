@@ -50,8 +50,6 @@ void Connection::onRead( const boost::system::error_code& err, size_t bytesTrans
 			stream.read( data, bytesTransferred );
 		}
 		mSignalRead( Buffer( data, bytesTransferred ) );
-		
-		ostream stream( &mResponse );
 		mResponse.consume( mResponse.size() );
 	}
 }
