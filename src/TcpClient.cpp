@@ -1,10 +1,6 @@
 #include "TcpClient.h"
 
 #include "cinder/Utilities.h"
-#include <iostream>
-#include <istream>
-#include <ostream>
-#include <boost/bind.hpp>
 
 using namespace ci;
 using namespace std;

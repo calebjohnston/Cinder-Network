@@ -94,8 +94,6 @@ void WebSocketClientApp::onResolve()
 void WebSocketClientApp::onWrite( size_t bytesTransferred )
 {
 	console() << bytesTransferred << " bytes written." << endl << endl;
-	
-	mClient->read();
 }
 
 void WebSocketClientApp::send()

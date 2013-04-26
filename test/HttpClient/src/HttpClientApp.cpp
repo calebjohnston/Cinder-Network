@@ -69,9 +69,13 @@ void HttpClientApp::onRead( ci::Buffer buffer )
 	
 	// Stringify buffer
 	string response( static_cast<const char*>( buffer.getData() ) );
-	for ( size_t i = 0; i < 5; ++i ) {
-		response.pop_back(); // Discard the last five bytes
+	
+	// TODO get rid of this hack
+	size_t count = buffer.getDataSize() == 512 ? 5 : 3;
+	for ( size_t i = 0; i < count; ++i ) {
+		response.pop_back(); // Discard the last few bytes
 	}
+	
 	mResponse += response;
 	
 	mClient->read();

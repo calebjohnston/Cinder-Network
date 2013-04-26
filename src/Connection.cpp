@@ -1,10 +1,6 @@
 #include "Connection.h"
 
 #include "cinder/Utilities.h"
-#include <iostream>
-#include <istream>
-#include <ostream>
-#include <boost/bind.hpp>
 
 using namespace ci;
 using namespace std;
@@ -47,5 +43,5 @@ void Connection::onRead( const boost::system::error_code& err, size_t bytesTrans
 		stream.read( data, bytesTransferred );
 		mSignalRead( Buffer( data, bytesTransferred ) );
 	}
-	mResponse.consume( mResponse.size() );
+	mResponse.consume( bytesTransferred );
 }
