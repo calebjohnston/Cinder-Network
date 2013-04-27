@@ -38,10 +38,11 @@ void Connection::onRead( const boost::system::error_code& err, size_t bytesTrans
 			mSignalError( err.message(), bytesTransferred );
 		}
 	} else {
-		char data[ bytesTransferred ];
+		char* data = new char[ bytesTransferred ];
 		istream stream( &mResponse );
 		stream.read( data, bytesTransferred );
 		mSignalRead( Buffer( data, bytesTransferred ) );
+		delete[] data;
 	}
 	mResponse.consume( bytesTransferred );
 }

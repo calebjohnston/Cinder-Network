@@ -31,6 +31,13 @@ void UdpClient::connect( const string& host, const string& protocol )
 											   boost::asio::placeholders::iterator ) );
 }
 
+void UdpClient::disconnect()
+{
+	if ( mSocket && mSocket->is_open() ) {
+		mSocket->close();
+	}
+}
+
 void UdpClient::read()
 {
 	/*mSocket->async_receive( mResponse, boost::asio::transfer_at_least( 1 ),

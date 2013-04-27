@@ -18,30 +18,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\ClientApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\TcpClient.cpp">
-      <Filter>Blocks\Cinder-Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\WebSocketClient.cpp">
-      <Filter>Blocks\Cinder-Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Client.cpp">
       <Filter>Blocks\Cinder-Network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\UdpClient.cpp">
       <Filter>Blocks\Cinder-Network</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\SmtpClient.cpp">
+    <ClCompile Include="..\..\..\src\Connection.cpp">
       <Filter>Blocks\Cinder-Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\HttpClientApp.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\TcpClient.h">
-      <Filter>Blocks\Cinder-Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\WebSocketClient.h">
       <Filter>Blocks\Cinder-Network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Client.h">
@@ -50,7 +41,7 @@
     <ClInclude Include="..\..\..\src\UdpClient.h">
       <Filter>Blocks\Cinder-Network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SmtpClient.h">
+    <ClInclude Include="..\..\..\src\Connection.h">
       <Filter>Blocks\Cinder-Network</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,3 +3,6 @@ build
 Caleb.xcuserdatad
 /test/Client/xcode/HttpClient.xcodeproj/xcuserdata/
 xcuserdata
+*.sdf
+Debug
+bin

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "boost/asio.hpp"
+#include "boost/signals2.hpp"
+#include "boost/bind.hpp"
+
 #include "cinder/Buffer.h"
 #include <string>
 

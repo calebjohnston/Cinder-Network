@@ -102,19 +102,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\Client.cpp" />
-    <ClCompile Include="..\..\..\src\SmtpClient.cpp" />
+    <ClCompile Include="..\..\..\src\Connection.cpp" />
     <ClCompile Include="..\..\..\src\TcpClient.cpp" />
     <ClCompile Include="..\..\..\src\UdpClient.cpp" />
-    <ClCompile Include="..\..\..\src\WebSocketClient.cpp" />
-    <ClCompile Include="..\src\ClientApp.cpp" />
+    <ClCompile Include="..\src\HttpClientApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Client.h" />
-    <ClInclude Include="..\..\..\src\SmtpClient.h" />
+    <ClInclude Include="..\..\..\src\Connection.h" />
     <ClInclude Include="..\..\..\src\TcpClient.h" />
     <ClInclude Include="..\..\..\src\UdpClient.h" />
-    <ClInclude Include="..\..\..\src\WebSocketClient.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
